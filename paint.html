@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>paint</title>
+    <link rel="stylesheet" href="style.css" type="text/css" media="all">
+
+
+  </head>
+  <body>
+    <h1>Paint</h1>
+    <h2><input type="file" id="selectfile"></h2>
+
+    <div class="container">
+    <div class="wrapper">
+    <canvas id="canvas">
+      HTML5　Canvasに対応したブラウザを使用してください。
+    </canvas>
+    <!-- .wrapper // --></div>
+    strokeStyle：
+    <input id="page_strokeStyle" type="text" value="rgba(255, 0, 0, 1.0)"
+      onkeyup="page.update();" style="width:200px;"><br><br>
+    globalAlpha：
+    <input id="page_globalAlpha" type="text" value="1.0"
+      onkeyup="page.update();" style="width:200px;"><br><br>
+    lineWidth：
+    <input id="page_lineWidth" type="text" value="1.0"
+      onkeyup="page.update();" style="width:200px;"><br><br>
+
+
+    <div id="menu">
+      <button  type="button" name="download" value="save" onclick="saveData()"class="effect">
+        <font size='4'>SAVE</font>
+      </button>
+    </div>
+    <script type="text/javascript" src="canvas2image.js"></script>
+    <script type="text/javascript" src="draw.js"></script>
+
+    <p><a href="top.php"class="log">Back</a></p>
+
+  </div>
+  </body>
+</html>

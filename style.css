@@ -1,0 +1,233 @@
+.wrapper{
+    width:100%;
+    height:100%;
+}
+
+body {
+    position:relative ;
+    background-image: url("Leaf.jpg")  ;
+    background-repeat: no-repeat;
+    background-position: 50% ;
+}
+ul {
+    list-style-type: none;
+}
+
+h1 {
+    color: #8cd460;
+    text-align: center;
+    font-family:'Comic Sans MS';
+
+}
+h2 {
+    color: #8cd460;
+    text-align: center;
+    font-family:'Comic Sans MS';
+}
+p{
+    color: #8cd460;
+    text-align: center;
+}
+.errorMes {
+    color: #8cd460;
+    text-align: center;
+    font-family:'Comic Sans MS';
+}
+.doing{
+    margin-bottom: 50px;
+}
+.container{
+    text-align: center;
+    color: #8cd460;
+    font-family:'Comic Sans MS';
+}
+
+.link{
+    font-family:'Comic Sans MS';
+    float:right ;
+    margin-right:100px;
+}
+.write{
+
+    margin-bottom: 30px;
+    width: 300px;
+    text-align:center;
+}
+
+input#submit_button{
+    padding: 8px 20px;
+    font-size: 0.8em;
+    background-color: #8cd460;
+    color: #fff;
+    border-style: none;
+}
+button.effect{
+    padding: 8px 20px;
+    font-size: 0.8em;
+    background-color: #8cd460;
+    color: #fff;
+    margin-top:5px;
+    border-style: none;
+}
+label {
+	color: #AAAAAA;			/* ラベルテキストの色を指定する */
+	font-size: 13px; 		/* ラベルテキストのサイズを指定する */
+	background-color: #006DD9;/* ラベルの背景色を指定する */
+	padding: 6px;			/* ラベルとテキスト間の余白を指定する */
+	border-radius: 10px;	/* ラベルボックスの角丸を指定する */
+	cursor:pointer;			/* マウスカーソルの形を指定する */
+}
+label > input{
+	display:none;	/* アップロードボタンのスタイルを無効にする */
+}
+div{
+	margin:20px;	/* ボタンとテキストボックス間の余白を指定する */
+}
+.log {
+    position: relative;
+    display: inline-block;
+    font-weight: bold;
+    padding: 0.25em 0.5em;
+    text-decoration: none;
+    border-bottom: solid 3px #8cd460;
+    border-left: solid 3px #8cd460;
+    color: #8cd460;
+    transition: .4s;
+    float: right;
+    margin-right:100px;
+}
+
+.log:hover{
+    padding-left: 0.7em;
+    padding-right: 0.3em;
+}
+
+
+.btn{
+
+    margin-top:30px;
+    display: inline-block;
+    text-decoration: none;
+    background: #8cd460;
+    color: rgba(255, 255, 255, 1);
+    font-weight: bold;
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    border-radius: 50%;
+    text-align: center;
+    vertical-align: middle;
+    overflow: hidden;
+    box-shadow: 0px 0px 0px 5px #8cd460;
+    border: solid 2px rgba(255, 255, 255, 1);
+    background-image: -webkit-linear-gradient(45deg, #8cd460 0%, #8cd460 100%);
+    background-image: linear-gradient(45deg, #8cd460 0%, #8cd460 100%);
+    transition: .4s;
+
+}
+
+.btn:hover{
+    border-style: dashed;
+    -webkit-transform: rotate(15deg);
+    -ms-transform: rotate(15deg);
+}
+
+.fl_inst {
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    color: #2e6ca5;
+    font-size: 15px;
+    text-decoration: none;
+    }
+
+  .fl_inst:hover {
+    color:#668ad8;
+    transition: .5s;
+  }
+
+  .fl_inst .insta{
+    border-radius: 13px;
+    position: relative;
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    font-size: 15px;
+    line-height: 25px;
+    vertical-align: middle;
+    background: -webkit-linear-gradient(135deg, #427eff 0%, #f13f79 70%) no-repeat;
+    background: linear-gradient(135deg, #427eff 0%, #f13f79 70%) no-repeat;
+    overflow: hidden
+  }
+
+
+  .fl_tw {
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    color: #1da1f3;
+    font-size: 15px;
+    text-decoration: none;
+    }
+
+
+  .fl_tw:hover {
+    color:#88daff;
+    transition: .5s;
+  }
+
+  .fl_tw .twicon{
+    border-radius: 10px;
+    position: relative;
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    font-size: 15px;
+    line-height: 25px;
+    vertical-align: middle;
+    color: #FFF;
+    background: #1da1f3;
+  }
+
+  /* インスタグラム */
+.instagram-timeline {
+  padding-top: 12px;
+  margin: 0 10px;
+  height: 340px;
+  overflow: hidden;
+  overflow-y: auto;
+  width: 99%;
+}
+.instagram-timeline ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+.instagram-timeline ul:after,
+.instagram-timeline ul:before {
+  display: block;
+  content: "";
+  clear: both;
+}
+.instagram-timeline ul li {
+  display: block;
+  //width: 3em;
+  margin: 0 10px;
+  padding: 0;
+  float: left;
+}
+.instagram-profile {
+  margin-bottom: 16px;
+}
+.instagram-profile a {
+  display: inline-block;
+  vertical-align: middle;
+}
+.instagram-timeline img {
+  height: 200px;
+  width: auto;
+  border-radius: 5%;
+  /* margin-right: 4px; */
+  margin: 3px 4px;
+  vertical-align: bottom;
+}

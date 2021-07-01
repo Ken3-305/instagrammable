@@ -1,0 +1,766 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet"href="style.css">
+<title>Filter</title>
+</head>
+
+<body>
+<h1>Filter</h1>
+<h2><input type="file" id="selectfile" accept='image/*'></h2>
+<div class="container">
+<p>
+    <canvas id="canvasDisplay"></canvas>
+    <img id="newImg">
+    <canvas id="canvas2Display"></canvas>
+    <canvas id="canvas"></canvas>
+    <canvas id="canvas2"></canvas>
+</p>
+<p>
+<button type="button" name="saturation" value="彩度" onClick="saturation()" class="effect">
+    <img src="image/saturation.png"><br>
+    <font size="1">saturation</font>
+</button>
+<button type="button" name="delicious" value="デリシャス" onClick="delicious()" class="effect">
+    <img src="image/delicious.png"><br>
+    <font size="1">delicious</font>
+</button>
+<button type="button" name="shadow" value="シャドウ" onClick="shadow()"class="effect">
+    <img src="image/shadow.png"><br>
+    <font size="1">shadow</font>
+</button>
+<button type="button" name="white" value="ホワイト" onClick="white()"class="effect">
+    <img src="image/white.png"><br>
+    <font size="1">white</font>
+</button>
+<button type="button" name="daylight" value="デイライト" onClick="daylight()"class="effect">
+    <img src="image/daylight.png"><br>
+    <font size="1">daylight</font>
+</button>
+<button type="button" name="antique" value="アンティーク" onClick="antique()"class="effect">
+    <img src="image/antique.png"><br>
+    <font size="1">antique</font>
+</button>
+<button type="button" name="romance" value="ロマンス" onClick="romance()"class="effect">
+    <img src="image/romance.png"><br>
+    <font size="1">romance</font>
+</button>
+<button type="button" name="ice" value="アイス" onClick="ice()"class="effect">
+    <img src="image/ice.png"><br>
+    <font size="1">ice</font>
+</button>
+<button type="button" name="sepia" value="セピア" onClick="sepia()"class="effect">
+    <img src="image/sepia.png"><br>
+    <font size="1">sepia</font>
+</button>
+<button type="button" name="monotone" value="モノトーン" onClick="monotone()"class="effect">
+        <img src="image/monotone.png"><br>
+        <font size="1">monotone</font>
+</button>
+<button type="button" name="lip" value="リップ" onClick="lip()"class="effect">
+    <img src="image/lip.png"><br>
+    <font size="1">lip</font>
+</button>
+<button type="button" name="sky" value="スカイ" onClick="sky()"class="effect">
+    <img src="image/sky.png"><br>
+    <font size="1">sky</font>
+</button>
+<button type="button" name="red" value="レッド" onClick="red()"class="effect">
+    <img src="image/red.png"><br>
+    <font size="1">red</font>
+</button>
+<button type="button" name="blue" value="ブルー" onClick="blue()"class="effect">
+        <img src="image/blue.png"><br>
+        <font size="1">blue</font>
+    </button>
+<button type="button" name="inversion" value="反転" onClick="inversion()"class="effect">
+    <img src="image/inversion.png"><br>
+    <font size="1">inversion</font>
+</button>
+<button type="button" name="redblue" value="レッドブルー" onClick="redblue()"class="effect">
+    <img src="image/redblue.png"><br>
+    <font size="1">redblue</font>
+</button>
+</p>
+<div id="output"></div>
+<button type="button" name="download" value="ダウンロード" onClick="download()"class="effect">
+    <font size="4">Download</font>
+</button>
+<div id="result"></div>
+
+
+<script type = "text/javascript">
+//RGB色空間からHSV色空間へ変換する関数
+ var HSV = function rgb2hsv(r, g, b){
+    var max = Math.max(r, g, b);
+    var min = Math.min(r, g, b);
+    var hsv = {'h':0,
+               's':0,
+               'v':max}; // V(明度)
+
+    if (max != min) {
+      // H(色相)
+      if (max == r) hsv.h = 60 * (g - b) / (max-min);
+      if (max == g) hsv.h = 60 * (b - r) / (max-min) + 120;
+      if (max == b) hsv.h = 60 * (r - g) / (max-min) + 240;
+
+      // S(彩度)
+      hsv.s = (max - min) / max;
+    }
+
+    if (hsv.h < 0){
+      hsv.h = hsv.h + 360;
+    }
+
+
+    hsv.h =  Math.round(hsv.h);
+    hsv.s =  Math.round(hsv.s * 100);
+    hsv.v =  Math.round((hsv.v / 255) * 100);
+    return hsv;
+  };
+
+//HSV(HSB)色空間からRGB色空間へ変換する関数
+//  h(hue)       : 色相/色合い   0-360度の値
+//  s(saturation): 彩度/鮮やかさ 0-100%の値
+//  v(Value)     : 明度/明るさ   0-100%の値
+var RGB = function hsv2rgb(h, s, v){
+    var max = v;
+    var min = max - ((s / 255) * max);
+    var rgb = {'r':0,'g':0,'b':0};
+
+    if (h == 360){
+      h = 0;
+    }
+
+    s = s / 100;
+    v = v / 100;
+
+    if (s == 0){
+      rgb.r = v * 255;
+      rgb.g = v * 255;
+      rgb.b = v * 255;
+      return rgb;
+    }
+
+    var dh = Math.floor(h / 60);
+    var p = v * (1 - s);
+    var q = v * (1 - s * (h / 60 - dh));
+    var t = v * (1 - s * (1 - (h / 60 - dh)));
+
+    switch (dh){
+     case 0 : rgb.r = v; rgb.g = t; rgb.b = p;  break;
+     case 1 : rgb.r = q; rgb.g = v; rgb.b = p;  break;
+     case 2 : rgb.r = p; rgb.g = v; rgb.b = t;  break;
+     case 3 : rgb.r = p; rgb.g = q; rgb.b = v;  break;
+     case 4 : rgb.r = t; rgb.g = p; rgb.b = v;  break;
+     case 5 : rgb.r = v; rgb.g = p; rgb.b = q;  break
+    }
+
+    rgb.r =  Math.round(rgb.r * 255);
+    rgb.g =  Math.round(rgb.g * 255);
+    rgb.b =  Math.round(rgb.b * 255);
+    return rgb;
+  };
+
+//セピア変換関数
+//色相を25、彩度を25にする
+var sepiaFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            hsv.h = 25;
+            hsv.s = 25;
+            hsv.v = hsv.v;
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//彩度変換関数
+//彩度を30上げる
+var saturationFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            hsv.s = hsv.s + 30;
+            if( hsv.s > 100 ){
+                hsv.s = 100;
+            }
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//おいしい変換関数
+//食べ物用フィルター
+var deliciousFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            hsv.s = hsv.s + 18;
+            hsv.v = hsv.v + 10;
+            if( hsv.s > 100 ){
+                hsv.s = 100;
+            }
+            if( hsv.v > 100 ){
+                hsv.v = 100;
+            }
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r + 20;
+            dst[idx + 1] = rgb.g + 20;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//モノトーン変換関数
+//彩度を0にする
+var monotoneFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            hsv.h = hsv.h;
+            hsv.s = 0;
+            hsv.v = hsv.v-10;
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//リップフィルター
+//色相0~15,345~360(赤)以外モノトーンにする
+var lipFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            if( hsv.h <= 15 ){
+                hsv.h = hsv.h;
+                hsv.s = hsv.s - hsv.h*50/15;
+                hsv.v = hsv.v;
+            } else if( hsv.h >= 345 ){
+                hsv.h = hsv.h;
+                hsv.s = hsv.s - (360-hsv.h)*50/15;
+                hsv.v = hsv.v;
+            } else {
+                hsv.h = hsv.h;
+                hsv.s = 0;
+                hsv.v = hsv.v-10;
+            }
+            if( hsv.s < 0 ){
+                hsv.s = 0;
+            }
+            if( hsv.s > 100 ){
+                hsv.s = 100;
+            }
+            if( hsv.v < 0 ){
+                hsv.v = 0;
+            }
+            if( hsv.v > 100 ){
+                hsv.v = 100;
+            }
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//スカイフィルター
+//色相170~230(青)以外モノトーンにする
+var skyFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            if( hsv.h >= 170 && hsv.h <= 230 ){
+                hsv.h = hsv.h;
+                hsv.s = hsv.s;
+                hsv.v = hsv.v;
+            } else {
+                hsv.h = hsv.h;
+                hsv.s = 0;
+                hsv.v = hsv.v-10;
+            }
+            if( hsv.s < 0 ){
+                hsv.s = 0;
+            }
+            if( hsv.s > 100 ){
+                hsv.s = 100;
+            }
+            if( hsv.v < 0 ){
+                hsv.v = 0;
+            }
+            if( hsv.v > 100 ){
+                hsv.v = 100;
+            }
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//レッドフィルター
+//赤くする
+var redFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            hsv.h = 0;
+            hsv.s = hsv.s - 10;
+            hsv.v = hsv.v;
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r + 10;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//ブルーフィルター
+//青くする
+var blueFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            hsv.h = 240;
+            hsv.s = hsv.s - 10;
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r / 2;
+            dst[idx + 1] = rgb.g / 2;
+            dst[idx + 2] = rgb.b * 2;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//シャドウフィルター
+//暗い部分をさらに暗くする
+var shadowFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            hsv.s = hsv.s + 20;
+            if( hsv.v <= 50 ){
+                hsv.v = hsv.v / 2;
+            } else {
+                hsv.v = ( hsv.v - 50 ) * 3 / 2 + 25;
+            }
+            if( hsv.s < 0 ){
+                hsv.s = 0;
+            }
+            if( hsv.s > 100 ){
+                hsv.s = 100;
+            }
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//ホワイトフィルター
+//白っぽくする
+var whiteFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            hsv.s = hsv.s - 30;
+            hsv.v = hsv.v + 20;
+            if( hsv.s < 0 ){
+                hsv.s = 0;
+            }
+            if( hsv.v > 100 ){
+                hsv.v = 100;
+            }
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//デイライトフィルター
+//色相を60(黄色)に若干近づける
+var daylightFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            if ( hsv.h <= 240 ){
+                hsv.h = hsv.h + 120;
+            } else {
+                hsv.h = hsv.h - 240;
+            }
+            if ( hsv.h <= 15 || hsv.h >= 345 ) {
+            } else if ( hsv.h < 180 ){
+                hsv.h = 180 - ( 180 - hsv.h ) / 1.2;
+            } else {
+                hsv.h = ( hsv.h - 180 ) / 1.2 + 180;
+            }
+            if ( hsv.h >= 120 ){
+                hsv.h = hsv.h - 120;
+            } else {
+                hsv.h = hsv.h + 240;
+            }
+            hsv.s = hsv.s - 10;
+            hsv.v = hsv.v + 20;
+            if( hsv.s < 0 ){
+                hsv.s = 0;
+            }
+            if( hsv.v > 100 ){
+                hsv.v = 100;
+            }
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//アンティークフィルター
+//色相を30(オレンジ)に若干近づける
+var antiqueFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            if ( hsv.h <= 330 ){
+                hsv.h = hsv.h + 30;
+            } else {
+                hsv.h = hsv.h - 330;
+            }
+            if ( hsv.h < 180 ){
+                hsv.h = 180 - ( 180 - hsv.h ) / 1.2;
+            } else {
+                hsv.h = ( hsv.h - 180 ) / 1.2 + 180;
+            }
+            if ( hsv.h >= 30 ){
+                hsv.h = hsv.h - 30;
+            } else {
+                hsv.h = hsv.h + 330;
+            }
+            hsv.s = hsv.s - 10;
+            hsv.v = hsv.v - 10;
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//ロマンスフィルター
+//色相を300(ピンク)に若干近づける
+var romanceFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            if ( hsv.h <= 300 ){
+                hsv.h = hsv.h + 60;
+            } else {
+                hsv.h = hsv.h - 300;
+            }
+            if ( hsv.h < 180 ){
+                hsv.h = 180 - ( 180 - hsv.h ) / 1.2;
+            } else {
+                hsv.h = ( hsv.h - 180 ) / 1.2 + 180;
+            }
+            if ( hsv.h >= 60 ){
+                hsv.h = hsv.h - 60;
+            } else {
+                hsv.h = hsv.h + 300;
+            }
+            hsv.s = hsv.s + 5;
+            hsv.v = hsv.v + 10;
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r + 50;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//アイスフィルター
+//青成分を強くする
+var iceFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            var hsv = HSV( src[idx], src[idx + 1], src[idx + 2] );
+            if ( hsv.h <= 240 ){
+                hsv.h = hsv.h + 120;
+            } else {
+                hsv.h = hsv.h - 240;
+            }
+            if ( hsv.h < 180 ){
+                hsv.h = 180 - ( 180 - hsv.h ) / 1.2;
+            } else {
+                hsv.h = ( hsv.h - 180 ) / 1.2 + 180;
+            }
+            if ( hsv.h >= 120 ){
+                hsv.h = hsv.h - 120;
+            } else {
+                hsv.h = hsv.h + 240;
+            }
+            hsv.s = hsv.s + 5;
+            hsv.v = hsv.v + 10;
+            var rgb = RGB( hsv.h, hsv.s, hsv.v );
+            dst[idx] = rgb.r;
+            dst[idx + 1] = rgb.g;
+            dst[idx + 2] = rgb.b + 50;
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//反転フィルター
+//色相を反転する
+var inversionFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            dst[idx] = 255 - src[idx];
+            dst[idx + 1] = 255 - src[idx + 1];
+            dst[idx + 2] = 255 - src[idx + 2];
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+//あかあおフィルター
+//赤と青を入れ替える
+var redblueFilter = function(src, dst, width, height) {
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var idx = (j + i * width) * 4;
+            dst[idx] = src[idx + 2];
+            dst[idx + 1] = src[idx + 1];
+            dst[idx + 2] = src[idx];
+            dst[idx + 3] = src[idx + 3];
+        }
+    }
+};
+
+var img;
+var width, height;
+var canvas, context;
+var canvas2, context2;
+var canvasDisplay, contextDisplay;
+var canvas2Display, context2Display;
+var srcData, dstData;
+var src, dst;
+var proportion;
+var dataurl;
+
+var ofd = document.getElementById("selectfile");
+ofd.addEventListener("change", function(evt) {
+    var img = null;
+    var canvas = document.createElement("canvas");
+
+    var file = evt.target.files;
+    var reader = new FileReader();
+
+    //dataURL形式でファイルを読み込む
+    reader.readAsDataURL(file[0]);
+
+    //ファイルの読込が終了した時の処理
+    reader.onload = function(){
+        img = new Image();
+
+        img.onload = function(){
+            //キャンバスに画像を表示する
+            canvas = document.getElementById("canvas");
+            context = canvas.getContext('2d');
+
+            canvasDisplay = document.getElementById("canvasDisplay");
+            contextDisplay = canvasDisplay.getContext('2d');
+
+            canvas2 = document.getElementById("canvas2");
+            context2 = canvas2.getContext('2d');
+
+            canvas2Display = document.getElementById("canvas2Display");
+            context2Display = canvas2Display.getContext('2d');
+
+            width = img.width;
+            height = img.height;
+            proportion = height / width;
+
+            canvas.width = width/4;
+            canvas.height = height/4;
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            canvasDisplay.width = 600;
+            canvasDisplay.height = 600 * proportion;
+            contextDisplay.drawImage(img, 0, 0, canvasDisplay.width, canvasDisplay.height);
+
+            //フィルター処理
+            srcData = context.getImageData(0, 0, width, height);
+            dstData = context.createImageData(width, height);
+            src = srcData.data;
+            dst = dstData.data;
+
+            context.clearRect(0, 0, width, height);
+            canvas.width = 0;
+            canvas.height = 0;
+        }
+        img.src = reader.result;
+    }
+}, false);
+
+//画像加工関数を呼び出す関数/////////////////////////
+function sepia(){
+    sepiaFilter(src, dst, width, height);
+    edit();
+}
+
+function saturation(){
+    saturationFilter(src, dst, width, height);
+    edit();
+}
+
+function delicious(){
+    deliciousFilter(src, dst, width, height);
+    edit();
+}
+
+function monotone(){
+    monotoneFilter(src, dst, width, height);
+    edit();
+}
+
+function lip(){
+    lipFilter(src, dst, width, height);
+    edit();
+}
+
+function sky(){
+    skyFilter(src, dst, width, height);
+    edit();
+}
+
+function red(){
+    redFilter(src, dst, width, height);
+    edit();
+}
+
+function blue(){
+    blueFilter(src, dst, width, height);
+    edit();
+}
+
+function shadow(){
+    shadowFilter(src, dst, width, height);
+    edit();
+}
+
+function white(){
+    whiteFilter(src, dst, width, height);
+    edit();
+}
+
+function daylight(){
+    daylightFilter(src, dst, width, height);
+    edit();
+}
+
+function antique(){
+    antiqueFilter(src, dst, width, height);
+    edit();
+}
+
+function romance(){
+    romanceFilter(src, dst, width, height);
+    edit();
+}
+
+function ice(){
+    iceFilter(src, dst, width, height);
+    edit();
+}
+
+function inversion(){
+    inversionFilter(src, dst, width, height);
+    edit();
+}
+
+function redblue(){
+    redblueFilter(src, dst, width, height);
+    edit();
+}
+///////////////////////////////////////////////////
+
+//加工した画像を表示する関数/////////////////////////
+function edit(){
+    canvas2.width = width/4;
+    canvas2.height = height/4;
+    context2.putImageData(dstData, 0, 0);
+
+    //画像タグに代入して表示
+    dataurl = canvas2.toDataURL();
+    document.getElementById("newImg").src = dataurl;
+    document.getElementById("newImg").width = 600;
+    document.getElementById("newImg").height = 600 * proportion;
+
+    context2.clearRect(0, 0, width, height);
+    canvas2.width = 0;
+    canvas2.height = 0;
+
+    context2Display.clearRect(0, 0, width, height);
+    canvas2Display.width = 0;
+    canvas2Display.height = 0;
+}
+////////////////////////////////////////////////////
+
+function download(){
+    // ダウンロードリンクを生成して出力
+    var dlLink = document.createElement('a');
+    dlLink.href = dataurl;
+    dlLink.download = 'sample.png';
+    dlLink.innerText = 'ダウンロード';
+    document.getElementById('result').appendChild(dlLink);
+}
+
+</script>
+
+<p><a href="top.php"class="log">Back</a></p>
+</div>
+</body>
+</html>
